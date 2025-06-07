@@ -1,2 +1,1 @@
-# repo-stargazer
-Repo Stargazer
+# Stargazer
