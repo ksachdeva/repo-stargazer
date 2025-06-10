@@ -1,15 +1,18 @@
 import logging
-from typing import Any
 
 import pandas as pd
 from github import Github
 from github.PaginatedList import PaginatedList
 from github.Repository import Repository
+from langchain_chroma.vectorstores import Chroma as ChromaVectorStore
+from langchain_text_splitters import TokenTextSplitter
 from mpire.pool import WorkerPool
 from rich.progress import track
 
 from ._config import SETTINGS, Settings
-from ._locations import data_directory, readme_data_directory
+from ._embedder import make_embedding_instance, run_embedder
+from ._locations import data_directory, readme_data_directory, vector_store_dir
+from ._types import GitHubRepoInfo
 
 _LOGGER = logging.getLogger("repo_stargazer.app")
 
@@ -26,14 +29,14 @@ def _refetch_starred_repositories(
 
 
 def _repos_to_df(repos: list[Repository]) -> pd.DataFrame:
-    def repo_to_dict(repo: Repository) -> dict[str, Any]:
-        return {
-            "id": repo.id,
-            "name": repo.full_name,
-            "description": repo.description,
-            "created_at": repo.created_at.isoformat(),
-            "topics": repo.get_topics(),
-        }
+    def repo_to_dict(repo: Repository) -> GitHubRepoInfo:
+        return GitHubRepoInfo(
+            id=repo.id,
+            name=repo.full_name,
+            description=repo.description,
+            created_at=repo.created_at.isoformat(),
+            topics=repo.get_topics(),
+        )
 
     with WorkerPool() as pool:
         records = pool.map(repo_to_dict, repos, progress_bar=True)
@@ -42,18 +45,50 @@ def _repos_to_df(repos: list[Repository]) -> pd.DataFrame:
 
 
 class RSG:
-    def __init__(self, settings: Settings) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+    ) -> None:
         SETTINGS.set(settings)
         self._settings = settings
         self._gh = Github(self._settings.github_pat.get_secret_value())
 
-    def build_db(self) -> None:
+        self._vs = ChromaVectorStore(
+            collection_name="github-starred-readme",
+            persist_directory=str(vector_store_dir()),
+            embedding_function=make_embedding_instance(embedder_settings=settings.embedder),
+        )
+
+    async def ask(self, query: str) -> None:
+        """Ask a question about the repositories."""
+        _LOGGER.info("Asking question: %s", query)
+
+        retriever = self._vs.as_retriever(search_kwargs={"k": 5})
+
+        documents = await retriever.ainvoke(input=query)
+
+        _LOGGER.info("Retrieved %d documents for query: %s", len(documents), query)
+        for doc in documents:
+            _LOGGER.info("Document: %s", doc.metadata["name"])
+
+    def _embed(self) -> None:
+        text_splitter = TokenTextSplitter(
+            chunk_size=self._settings.embedder.chunk_size,
+            chunk_overlap=self._settings.embedder.chunk_overlap,
+        )
+
+        run_embedder(
+            text_splitter=text_splitter,
+            vector_store=self._vs,
+        )
+
+    def build(self) -> None:
         user = self._gh.get_user()
 
         starred_repos_iter = user.get_starred()
         total_stars = starred_repos_iter.totalCount
 
-        parquet_file_path = data_directory() / f"{user.id}-starred-repos.parquet"
+        parquet_file_path = data_directory() / f"{user.id}-repos.starred.parquet"
 
         df: pd.DataFrame | None = None
 
@@ -90,3 +125,5 @@ class RSG:
 
         with WorkerPool() as pool:
             pool.map(_fetch_and_write_readme, df.iterrows(), iterable_len=len(df), progress_bar=True)
+
+        self._embed()

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 
 from typer import Typer
@@ -14,15 +15,23 @@ def make_rsg() -> RSG:
 
 
 @cli_app.command()
-def build_db() -> None:
+def build() -> None:
     """Build the database."""
     rsg = make_rsg()
-    rsg.build_db()
+    rsg.build()
+
+
+@cli_app.command()
+def ask(query: str) -> None:
+    """Ask a question."""
+    rsg = make_rsg()
+    asyncio.run(rsg.ask(query))
 
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("repo_stargazer.app").setLevel(logging.DEBUG)
+    logging.getLogger("repo_stargazer.embedder").setLevel(logging.DEBUG)
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("LiteLLM").setLevel(logging.WARNING)
     cli_app()
