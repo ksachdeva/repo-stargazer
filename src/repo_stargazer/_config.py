@@ -10,7 +10,7 @@ from pydantic_settings import (
     TomlConfigSettingsSource,
 )
 
-from .locations import config_file
+from ._locations import config_file
 
 
 class Settings(BaseSettings):

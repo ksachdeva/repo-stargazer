@@ -8,8 +8,8 @@ from github.Repository import Repository
 from mpire.pool import WorkerPool
 from rich.progress import track
 
-from .config import SETTINGS, Settings
-from .locations import data_directory, readme_data_directory
+from ._config import SETTINGS, Settings
+from ._locations import data_directory, readme_data_directory
 
 _LOGGER = logging.getLogger("repo_stargazer.app")
 

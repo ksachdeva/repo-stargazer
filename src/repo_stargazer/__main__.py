@@ -2,8 +2,8 @@ import logging
 
 from typer import Typer
 
-from repo_stargazer.app import RSG
-from repo_stargazer.config import Settings
+from repo_stargazer._app import RSG
+from repo_stargazer._config import Settings
 
 cli_app = Typer(name="The RSG agent")
 
