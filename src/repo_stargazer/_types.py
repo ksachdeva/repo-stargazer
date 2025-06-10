@@ -13,7 +13,7 @@ class GitHubRepoInfo(TypedDict):
     name: str
     description: str | None
     created_at: str
-    topics: list[str] | str
+    topics: list[str]
 
 
 class RetrievalResult(NamedTuple):

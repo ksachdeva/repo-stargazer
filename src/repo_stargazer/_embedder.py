@@ -68,8 +68,24 @@ def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None
     parquet_files = data_directory().glob("*.starred.parquet")
 
     def _process_read_me(index: int, row: pd.Series) -> None:
+        repo_info = GitHubRepoInfo(
+            id=row["id"],
+            name=row["name"],
+            description=row["description"] or "",
+            created_at=row["created_at"],
+            topics=row["topics"],
+        )
+
+        # add the description as a separate text unit
+        if row["description"]:
+            vector_store.add_texts(
+                [row["description"]],
+                metadatas=[repo_info],  # type: ignore
+            )
+
         readme_file_path = readme_data_directory() / f"{row.id}.md"
 
+        # some repositories may not have a README file
         if not readme_file_path.exists():
             return
 
@@ -81,14 +97,6 @@ def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None
 
         text_units = text_splitter.split_text(readme_content)
         # _LOGGER.debug("Number of text units for repo %s: %d", row["name"], len(text_units))
-
-        repo_info = GitHubRepoInfo(
-            id=row["id"],
-            name=row["name"],
-            description=row["description"] or "",
-            created_at=row["created_at"],
-            topics=", ".join(row["topics"]),
-        )
 
         metadatas = [repo_info] * len(text_units)
 
