@@ -17,6 +17,7 @@ dependencies = [
     "langchain-ollama>=0.3.3",
     "langchain-openai>=0.3.21",
     "langchain-text-splitters>=0.3.8",
+    "mcp>=1.9.3",
     "mpire>=2.10.2",
     "pandas>=2.3.0",
     "pydantic>=2.11.5",
@@ -94,3 +95,7 @@ fmt = "ruff format"
 [tool.poe.tasks.rsg]
 env = { RSG_CONFIG_FILE = "config.dev.toml" }
 cmd = "python src/repo_stargazer"
+
+[tool.poe.tasks.mcp]
+env = { RSG_CONFIG_FILE = "config.dev.toml" }
+cmd = "python src/repo_stargazer run-mcp-server"

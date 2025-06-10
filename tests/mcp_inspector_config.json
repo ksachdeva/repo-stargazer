@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    
+    "rsg": {
+      "command": "uv",
+      "args": ["run src/repo_stargazer run-mcp-server"],
+      "env": {
+        "RSG_CONFIG_FILE" : "config.dev.toml"
+      }
+    }
+  }
+}

@@ -15,7 +15,7 @@ from langchain_text_splitters import TextSplitter
 from rich.progress import track
 
 from ._config import EmbedderSettings
-from ._locations import cache_directory, data_directory, readme_data_directory, vector_store_dir
+from ._locations import cache_directory, data_directory, readme_data_directory
 from ._types import EmbeddingModelType, GitHubRepoInfo
 
 _LOGGER = logging.getLogger("repo_stargazer.embedder")

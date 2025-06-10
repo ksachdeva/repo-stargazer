@@ -93,6 +93,33 @@ class RSG:
             vector_store=self._vs,
         )
 
+    def get_readme(self, repo_name: str) -> str:
+        """Get the README of a repository."""
+
+        user = self._gh.get_user()
+
+        parquet_file_path = data_directory() / f"{user.id}-repos.starred.parquet"
+
+        df = pd.read_parquet(parquet_file_path)
+
+        try:
+            repo_id = df[df["name"] == repo_name].iloc[0]["id"]
+
+            _LOGGER.info("Fetching README for repository %s with ID %s", repo_name, repo_id)
+
+            readme_file_path = readme_data_directory() / f"{repo_id}.md"
+            if not readme_file_path.exists():
+                return f"README for repository {repo_name} not found."
+
+            return readme_file_path.read_text()
+
+        except IndexError:
+            _LOGGER.error("Repository %s not found in starred repositories.", repo_name)
+            return f"Repository {repo_name} not found in starred repositories."
+        except Exception as e:
+            _LOGGER.error("Error fetching README for repository %s: %s", repo_name, e)
+            return f"Error fetching README for repository {repo_name}: {e}"
+
     def build(self) -> None:
         user = self._gh.get_user()
 
