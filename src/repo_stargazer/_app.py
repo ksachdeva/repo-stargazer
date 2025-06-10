@@ -5,7 +5,7 @@ import pandas as pd
 from github import Github
 from github.PaginatedList import PaginatedList
 from github.Repository import Repository
-from langchain_chroma.vectorstores import Chroma as ChromaVectorStore
+from langchain_community.vectorstores import LanceDB as LanceDBVectorStore
 from langchain_text_splitters import TokenTextSplitter
 from mpire.pool import WorkerPool
 from rich.progress import track
@@ -54,10 +54,11 @@ class RSG:
         self._settings = settings
         self._gh = Github(self._settings.github_pat.get_secret_value())
 
-        self._vs = ChromaVectorStore(
-            collection_name="github-starred-readme",
-            persist_directory=str(vector_store_dir()),
-            embedding_function=make_embedding_instance(embedder_settings=settings.embedder),
+        self._vs = LanceDBVectorStore(
+            uri=str(vector_store_dir()),
+            embedding=make_embedding_instance(embedder_settings=settings.embedder),
+            mode="append",
+            table_name="github-readme",
         )
 
     async def ask(self, query: str, search_kwargs: dict[str, Any]) -> list[RetrievalResult]:

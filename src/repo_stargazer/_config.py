@@ -1,6 +1,5 @@
 import os
 from contextvars import ContextVar
-from enum import Enum
 from pathlib import Path
 
 from pydantic import BaseModel, SecretStr
