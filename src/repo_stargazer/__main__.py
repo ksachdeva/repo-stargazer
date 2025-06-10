@@ -25,7 +25,7 @@ def build() -> None:
 def ask(query: str) -> None:
     """Ask a question."""
     rsg = make_rsg()
-    asyncio.run(rsg.ask(query))
+    asyncio.run(rsg.ask(query, search_kwargs={"k": 5}))
 
 
 if __name__ == "__main__":

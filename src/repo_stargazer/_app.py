@@ -1,4 +1,5 @@
 import logging
+from typing import Any
 
 import pandas as pd
 from github import Github
@@ -12,7 +13,7 @@ from rich.progress import track
 from ._config import SETTINGS, Settings
 from ._embedder import make_embedding_instance, run_embedder
 from ._locations import data_directory, readme_data_directory, vector_store_dir
-from ._types import GitHubRepoInfo
+from ._types import GitHubRepoInfo, RetrievalResult
 
 _LOGGER = logging.getLogger("repo_stargazer.app")
 
@@ -59,17 +60,27 @@ class RSG:
             embedding_function=make_embedding_instance(embedder_settings=settings.embedder),
         )
 
-    async def ask(self, query: str) -> None:
+    async def ask(self, query: str, search_kwargs: dict[str, Any]) -> list[RetrievalResult]:
         """Ask a question about the repositories."""
-        _LOGGER.info("Asking question: %s", query)
 
-        retriever = self._vs.as_retriever(search_kwargs={"k": 5})
+        retriever = self._vs.as_retriever(search_kwargs=search_kwargs)
 
         documents = await retriever.ainvoke(input=query)
 
         _LOGGER.info("Retrieved %d documents for query: %s", len(documents), query)
+
+        results: list[RetrievalResult] = []
+
         for doc in documents:
             _LOGGER.info("Document: %s", doc.metadata["name"])
+            results.append(
+                RetrievalResult(
+                    chunk=doc.page_content,
+                    repo_info=doc.metadata,  # type: ignore
+                )
+            )
+
+        return results
 
     def _embed(self) -> None:
         text_splitter = TokenTextSplitter(

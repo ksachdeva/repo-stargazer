@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import TypedDict
+from typing import NamedTuple, TypedDict
 
 
 class EmbeddingModelType(str, Enum):
@@ -14,3 +14,8 @@ class GitHubRepoInfo(TypedDict):
     description: str | None
     created_at: str
     topics: list[str] | str
+
+
+class RetrievalResult(NamedTuple):
+    chunk: str
+    repo_info: GitHubRepoInfo
