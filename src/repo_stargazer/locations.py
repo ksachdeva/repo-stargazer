@@ -21,3 +21,10 @@ def config_directory() -> Path:
 
 def config_file() -> Path:
     return config_directory() / "config.yaml"
+
+
+def readme_data_directory() -> Path:
+    """Return (possibly creating) the readme data directory."""
+    readmes_dir = data_directory() / "readmes"
+    readmes_dir.mkdir(exist_ok=True, parents=True)
+    return readmes_dir

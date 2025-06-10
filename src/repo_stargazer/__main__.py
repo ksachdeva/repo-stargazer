@@ -22,6 +22,7 @@ def build_db() -> None:
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
+    logging.getLogger("repo_stargazer.app").setLevel(logging.DEBUG)
     logging.getLogger("httpx").setLevel(logging.WARNING)
     logging.getLogger("LiteLLM").setLevel(logging.WARNING)
     cli_app()
