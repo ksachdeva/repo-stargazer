@@ -57,7 +57,6 @@ class RSG:
         self._vs = LanceDBVectorStore(
             uri=str(vector_store_dir()),
             embedding=make_embedding_instance(embedder_settings=settings.embedder),
-            mode="append",
             table_name="github-readme",
         )
 

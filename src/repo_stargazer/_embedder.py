@@ -67,7 +67,7 @@ def make_embedding_instance(embedder_settings: EmbedderSettings) -> Embeddings:
 def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None:
     parquet_files = data_directory().glob("*.starred.parquet")
 
-    def _process_read_me(index: int, row: pd.Series) -> None:
+    def _process_read_me(index: int, row: pd.Series) -> tuple[list[str], list[GitHubRepoInfo]]:
         repo_info = GitHubRepoInfo(
             id=row["id"],
             name=row["name"],
@@ -76,38 +76,47 @@ def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None
             topics=row["topics"],
         )
 
+        description_text_units: list[str] = []
+        description_metadatas: list[GitHubRepoInfo] = []
+
         # add the description as a separate text unit
         if row["description"]:
-            vector_store.add_texts(
-                [row["description"]],
-                metadatas=[repo_info],  # type: ignore
-            )
+            description_text_units = [row["description"]]
+            description_metadatas = [repo_info]
 
         readme_file_path = readme_data_directory() / f"{row.id}.md"
 
         # some repositories may not have a README file
         if not readme_file_path.exists():
-            return
+            return description_text_units, description_metadatas
 
         readme_content = Path(readme_file_path).read_text(encoding="utf-8")
 
         if readme_content.strip() == "":
             _LOGGER.warning("Skipping empty README for repository %s", row["name"])
-            return
+            return description_text_units, description_metadatas
 
         text_units = text_splitter.split_text(readme_content)
         # _LOGGER.debug("Number of text units for repo %s: %d", row["name"], len(text_units))
 
         metadatas = [repo_info] * len(text_units)
 
-        vector_store.add_texts(
-            text_units,
-            metadatas=metadatas,  # type: ignore
-        )
+        text_units.extend(description_text_units)
+        metadatas.extend(description_metadatas)
+
+        return text_units, metadatas
+
+    all_text_units: list[str] = []
+    all_metadatas: list[GitHubRepoInfo] = []
 
     for f in parquet_files:
         _LOGGER.info("Processing file: %s", f)
         df = pd.read_parquet(f)
 
         for index, row in track(df.iterrows(), description="Processing readme files", total=len(df)):
-            _process_read_me(index, row)  # type: ignore
+            text_units, metadatas = _process_read_me(index, row)  # type: ignore
+            all_text_units.extend(text_units)
+            all_metadatas.extend(metadatas)
+
+    _LOGGER.info("Adding %d text units to vector store", len(all_text_units))
+    vector_store.add_texts(all_text_units, metadatas=all_metadatas)  # type: ignore
