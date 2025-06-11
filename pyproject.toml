@@ -93,9 +93,9 @@ reportMissingTypeStubs = false
 fmt = "ruff format"
 
 [tool.poe.tasks.rsg]
-env = { RSG_CONFIG_FILE = "config.dev.toml" }
+env = { RSG_CONFIG_FILE = "config.dev.toml", RSG_DATA_HOME =  "tmp"}
 cmd = "python src/repo_stargazer"
 
 [tool.poe.tasks.mcp]
-env = { RSG_CONFIG_FILE = "config.dev.toml" }
+env = { RSG_CONFIG_FILE = "config.dev.toml", RSG_DATA_HOME =  "tmp" }
 cmd = "python src/repo_stargazer run-mcp-server"
