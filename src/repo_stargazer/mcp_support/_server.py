@@ -22,7 +22,7 @@ def make_mcp_server(rsg: RSG) -> FastMCP:
     async def find_starred_repos(
         query: str = Field(description="The query to use to filter starred repositories."),
     ) -> list[str]:
-        results = await rsg.ask(query, search_kwargs={"k": 5})
+        results = await rsg.retrieve_starred_repositories(query)
         repo_names = [result.repo_info["name"] for result in results]
 
         # remove the duplicates
