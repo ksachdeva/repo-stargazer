@@ -6,17 +6,19 @@ I have been starring github projects for a long time.
 
 There are two primary intentions behind giving stars -
 
-* Recognize the efforts of the author
-* Bookmark the repository for my own use
+* Recognize the efforts of the author(s).
+* Bookmark the repository for my own use.
 
 Unfortunately the user interface to search the existing starred repositories is very primitive.
 
-Also, it would be nice to have not only do Semantic search but also provide the results to LLM to 
+Also, it would be nice to have not only Semantic search but also provide the results to LLM to 
 further explore the starred repositories.
+
+> I also wanted to explore Google ADK, Google A2A Protocol & MCP. This project makes use of all 3 technologies.
 
 ## Solution
 
-This project uses semantic search and an AI agent as an attempt to solve the above problem.
+This project/tool uses semantic search and an AI agent as an attempt to solve the above problems.
 
 ## Architecture & Implementation Details
 
@@ -24,20 +26,24 @@ This project uses semantic search and an AI agent as an attempt to solve the abo
 
 ## Install (User)
 
-You should be able to run this as tool thanks to `uvx`
+Read below to install `uv`. You haven't done it yet? Come on guys!!
+
+https://docs.astral.sh/uv/getting-started/installation/
+
+and then simply run `repo-stargazer` using `uvx`
 
 ```bash
 uvx --from repo-stargazer rsg --help
 ```
 
-## Usgage
+## Usage
 
 The tool requires you to have a configuration file in which various settings are to be specified. 
 
 There is an example configuration file `rsg-config.example.toml` at the root of this repository. The configuration
 uses TOML syntax.
 
-You should make a copy of it as perhaps call it `rsg-config.toml` (The name of the file does not really matter!)
+You should make a copy of it and perhaps call it `rsg-config.toml` (The name of the file does not really matter!)
 
 ### Step 1 - Obtain the Github Personal Access Token
 
