@@ -8,10 +8,6 @@ api_endpoint = "http://host.docker.internal:11434"
 chunk_size = 1000
 chunk_overlap = 120
 
-[agent]
-host = "localhost"
-port = 10001
-
 [agent.litellm_params]
 model = "azure/gpt-4o"
 

@@ -1,6 +1,6 @@
-import os
 from contextvars import ContextVar
 from pathlib import Path
+from typing import ClassVar
 
 from pydantic import BaseModel, SecretStr
 from pydantic_settings import (
@@ -10,7 +10,6 @@ from pydantic_settings import (
     TomlConfigSettingsSource,
 )
 
-from ._locations import config_file
 from ._types import EmbeddingModelType
 from .a2a_support import AgentServerConfig
 from .agent import AgentConfig
@@ -37,6 +36,8 @@ class Settings(BaseSettings):
     agent: AgentConfig
     a2a_server: AgentServerConfig
 
+    _toml_file: ClassVar[Path]
+
     @classmethod
     def settings_customise_sources(
         cls,
@@ -46,28 +47,13 @@ class Settings(BaseSettings):
         dotenv_settings: PydanticBaseSettingsSource,
         file_secret_settings: PydanticBaseSettingsSource,
     ) -> tuple[PydanticBaseSettingsSource, ...]:
-        config_from_env = os.getenv("RSG_CONFIG_FILE")
-        if config_from_env:
-            conf_file = Path(config_from_env).resolve()
-        else:
-            conf_file = config_file()
-
-        default_sources = (
+        return (
             init_settings,
+            TomlConfigSettingsSource(settings_cls, cls._toml_file),
             env_settings,
             dotenv_settings,
             file_secret_settings,
         )
-
-        if conf_file.exists():
-            return (
-                init_settings,
-                TomlConfigSettingsSource(settings_cls, conf_file),
-                env_settings,
-                dotenv_settings,
-                file_secret_settings,
-            )
-        return default_sources
 
 
 SETTINGS: ContextVar[Settings] = ContextVar("settings")

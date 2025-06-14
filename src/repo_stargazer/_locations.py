@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 
-from xdg_base_dirs import xdg_cache_home, xdg_config_home, xdg_data_home
+from xdg_base_dirs import xdg_cache_home, xdg_data_home
 
 
 def _get_data_home() -> Path:
@@ -9,13 +9,6 @@ def _get_data_home() -> Path:
     if env_rsg_data:
         return Path(env_rsg_data).expanduser().resolve()
     return xdg_data_home()
-
-
-def _get_config_home() -> Path:
-    env_rsg_data = os.getenv("RSG_DATA_HOME", None)
-    if env_rsg_data:
-        return Path(env_rsg_data).joinpath("config").expanduser().resolve()
-    return xdg_config_home()
 
 
 def _get_cache_home() -> Path:
@@ -34,15 +27,6 @@ def _rsg_directory(root: Path) -> Path:
 def data_directory() -> Path:
     """Return (possibly creating) the application data directory."""
     return _rsg_directory(_get_data_home())
-
-
-def config_directory() -> Path:
-    """Return (possibly creating) the application config directory."""
-    return _rsg_directory(_get_config_home())
-
-
-def config_file() -> Path:
-    return config_directory() / "config.yaml"
 
 
 def readme_data_directory() -> Path:

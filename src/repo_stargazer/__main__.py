@@ -1,6 +1,10 @@
+# ruff: noqa: B008
+
 import asyncio
 import logging
+from pathlib import Path
 
+import typer
 import uvicorn
 from typer import Typer
 
@@ -12,43 +16,81 @@ from repo_stargazer.mcp_support._server import make_mcp_server
 cli_app = Typer(name="The RSG agent")
 
 
-def _make_rsg() -> RSG:
+def _make_rsg(config: Path) -> RSG:
+    Settings._toml_file = config  # type: ignore[attr-defined]
     settings = Settings()  # type: ignore[call-arg]
     return RSG(settings=settings)
 
 
 @cli_app.command()
-def build() -> None:
+def build(
+    config: Path = typer.Option(
+        ...,
+        file_okay=True,
+        dir_okay=False,
+        help="The RSG TOML Configuration file",
+    ),
+) -> None:
     """Build the database."""
-    rsg = _make_rsg()
+    rsg = _make_rsg(config)
     rsg.build()
 
 
 @cli_app.command()
-def ask(query: str) -> None:
+def ask(
+    query: str,
+    config: Path = typer.Option(
+        ...,
+        file_okay=True,
+        dir_okay=False,
+        help="The RSG TOML Configuration file",
+    ),
+) -> None:
     """Ask a question."""
-    rsg = _make_rsg()
+    rsg = _make_rsg(config)
     asyncio.run(rsg.retrieve_starred_repositories(query))
 
 
 @cli_app.command()
-def get_readme(repo_name: str) -> None:
+def get_readme(
+    repo_name: str,
+    config: Path = typer.Option(
+        ...,
+        file_okay=True,
+        dir_okay=False,
+        help="The RSG TOML Configuration file",
+    ),
+) -> None:
     """Get the README of a repository."""
-    rsg = _make_rsg()
+    rsg = _make_rsg(config)
     readme = rsg.get_readme(repo_name)
     print(readme)
 
 
 @cli_app.command()
-def run_mcp_server() -> None:
+def run_mcp_server(
+    config: Path = typer.Option(
+        ...,
+        file_okay=True,
+        dir_okay=False,
+        help="The RSG TOML Configuration file",
+    ),
+) -> None:
     """Run the MCP server."""
-    rsg = _make_rsg()
+    rsg = _make_rsg(config)
     make_mcp_server(rsg).run(transport="stdio")
 
 
 @cli_app.command()
-def run_agent_server() -> None:
-    rsg = _make_rsg()
+def run_agent_server(
+    config: Path = typer.Option(
+        ...,
+        file_okay=True,
+        dir_okay=False,
+        help="The RSG TOML Configuration file",
+    ),
+) -> None:
+    rsg = _make_rsg(config)
     agent = rsg.make_adk_agent()
     settings = rsg.get_settings()
     a2a_app = make_a2a_server(agent, settings.a2a_server)

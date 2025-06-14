@@ -99,11 +99,10 @@ reportMissingTypeStubs = false
 fmt = "ruff format"
 
 [tool.poe.env]
-RSG_CONFIG_FILE = "config.dev.toml"
 RSG_DATA_HOME = "tmp"
 
-[tool.poe.tasks.rsg]
-cmd = "python src/repo_stargazer"
+[tool.poe.tasks.build]
+cmd = "python src/repo_stargazer build"
 
 [tool.poe.tasks.mcp]
 cmd = "python src/repo_stargazer run-mcp-server"
