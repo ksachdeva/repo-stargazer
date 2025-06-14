@@ -63,6 +63,10 @@ class RSG:
             table_name="github-readme",
         )
 
+    def get_settings(self) -> Settings:
+        """Get the settings of the application."""
+        return self._settings
+
     def get_retriever(self, search_kwargs: dict[str, Any]) -> BaseRetriever:
         """Get the vector store retriever."""
         return self._vs.as_retriever(search_kwargs=search_kwargs)

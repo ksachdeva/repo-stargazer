@@ -12,6 +12,7 @@ from pydantic_settings import (
 
 from ._locations import config_file
 from ._types import EmbeddingModelType
+from .a2a_support import AgentServerConfig
 from .agent import AgentConfig
 
 
@@ -34,6 +35,7 @@ class Settings(BaseSettings):
     embedder: EmbedderSettings
 
     agent: AgentConfig
+    a2a_server: AgentServerConfig
 
     @classmethod
     def settings_customise_sources(

@@ -9,7 +9,4 @@ class LiteLLMConfig(BaseModel):
 
 
 class AgentConfig(BaseModel):
-    host: str = "localhost"
-    port: int = 10001
-
     litellm_params: LiteLLMConfig

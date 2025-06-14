@@ -1,10 +1,12 @@
 import asyncio
 import logging
 
+import uvicorn
 from typer import Typer
 
 from repo_stargazer._app import RSG
 from repo_stargazer._config import Settings
+from repo_stargazer.a2a_support import make_a2a_server
 from repo_stargazer.mcp_support._server import make_mcp_server
 
 cli_app = Typer(name="The RSG agent")
@@ -12,8 +14,7 @@ cli_app = Typer(name="The RSG agent")
 
 def _make_rsg() -> RSG:
     settings = Settings()  # type: ignore[call-arg]
-    print(settings)
-    return RSG(settings)
+    return RSG(settings=settings)
 
 
 @cli_app.command()
@@ -43,6 +44,19 @@ def run_mcp_server() -> None:
     """Run the MCP server."""
     rsg = _make_rsg()
     make_mcp_server(rsg).run(transport="stdio")
+
+
+@cli_app.command()
+def run_agent_server() -> None:
+    rsg = _make_rsg()
+    agent = rsg.make_adk_agent()
+    settings = rsg.get_settings()
+    a2a_app = make_a2a_server(agent, settings.a2a_server)
+    uvicorn.run(
+        app=a2a_app.build(),
+        host=settings.a2a_server.host,
+        port=settings.a2a_server.port,
+    )
 
 
 if __name__ == "__main__":
