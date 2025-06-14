@@ -12,6 +12,7 @@ from pydantic_settings import (
 
 from ._locations import config_file
 from ._types import EmbeddingModelType
+from .agent import AgentConfig
 
 
 class EmbedderSettings(BaseModel):
@@ -30,8 +31,9 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict()
 
     github_pat: SecretStr
-
     embedder: EmbedderSettings
+
+    agent: AgentConfig
 
     @classmethod
     def settings_customise_sources(

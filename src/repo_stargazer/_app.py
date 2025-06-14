@@ -5,7 +5,9 @@ import pandas as pd
 from github import Github
 from github.PaginatedList import PaginatedList
 from github.Repository import Repository
+from google.adk.agents.llm_agent import LlmAgent
 from langchain_community.vectorstores import LanceDB as LanceDBVectorStore
+from langchain_core.retrievers import BaseRetriever
 from langchain_text_splitters import TokenTextSplitter
 from mpire.pool import WorkerPool
 from rich.progress import track
@@ -14,6 +16,7 @@ from ._config import SETTINGS, Settings
 from ._embedder import make_embedding_instance, run_embedder
 from ._locations import data_directory, readme_data_directory, vector_store_dir
 from ._types import GitHubRepoInfo, RetrievalResult
+from .agent import create_agent as create_adk_agent
 
 _LOGGER = logging.getLogger("repo_stargazer.app")
 
@@ -60,10 +63,23 @@ class RSG:
             table_name="github-readme",
         )
 
-    async def ask(self, query: str, search_kwargs: dict[str, Any]) -> list[RetrievalResult]:
-        """Ask a question about the repositories."""
+    def get_retriever(self, search_kwargs: dict[str, Any]) -> BaseRetriever:
+        """Get the vector store retriever."""
+        return self._vs.as_retriever(search_kwargs=search_kwargs)
 
-        retriever = self._vs.as_retriever(search_kwargs=search_kwargs)
+    async def retrieve_starred_repositories(
+        self,
+        query: str,
+        top_k: int = 5,
+    ) -> list[RetrievalResult]:
+        """Get the top K starred github repositories based on a query.
+
+        Args:
+            query (str): The query to search/retrieve the repositories.
+            top_k (int): The number of top results to return. Defaults to 5.
+        """
+
+        retriever = self.get_retriever(search_kwargs={"k": top_k})
 
         documents = await retriever.ainvoke(input=query)
 
@@ -82,19 +98,12 @@ class RSG:
 
         return results
 
-    def _embed(self) -> None:
-        text_splitter = TokenTextSplitter(
-            chunk_size=self._settings.embedder.chunk_size,
-            chunk_overlap=self._settings.embedder.chunk_overlap,
-        )
-
-        run_embedder(
-            text_splitter=text_splitter,
-            vector_store=self._vs,
-        )
-
     def get_readme(self, repo_name: str) -> str:
-        """Get the README of a repository."""
+        """Fetches the README of a repository.
+
+        Args:
+            repo_name (str): The name of the repository in the format 'owner/repo'.
+        """
 
         user = self._gh.get_user()
 
@@ -119,6 +128,15 @@ class RSG:
         except Exception as e:
             _LOGGER.error("Error fetching README for repository %s: %s", repo_name, e)
             return f"Error fetching README for repository {repo_name}: {e}"
+
+    def make_adk_agent(self) -> LlmAgent:
+        return create_adk_agent(
+            model_config=self._settings.agent,
+            tools=[
+                self.retrieve_starred_repositories,
+                self.get_readme,
+            ],
+        )
 
     def build(self) -> None:
         user = self._gh.get_user()
@@ -164,4 +182,12 @@ class RSG:
         with WorkerPool() as pool:
             pool.map(_fetch_and_write_readme, df.iterrows(), iterable_len=len(df), progress_bar=True)
 
-        self._embed()
+        text_splitter = TokenTextSplitter(
+            chunk_size=self._settings.embedder.chunk_size,
+            chunk_overlap=self._settings.embedder.chunk_overlap,
+        )
+
+        run_embedder(
+            text_splitter=text_splitter,
+            vector_store=self._vs,
+        )

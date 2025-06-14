@@ -9,6 +9,7 @@ authors = [
 requires-python = ">=3.13"
 dependencies = [
     "fastparquet>=2024.11.0",
+    "google-adk>=1.3.0",
     "httpx>=0.28.1",
     "lancedb>=0.23.0",
     "langchain>=0.3.25",
@@ -17,6 +18,7 @@ dependencies = [
     "langchain-ollama>=0.3.3",
     "langchain-openai>=0.3.21",
     "langchain-text-splitters>=0.3.8",
+    "litellm>=1.72.4",
     "mcp>=1.9.3",
     "mpire>=2.10.2",
     "pandas>=2.3.0",
@@ -102,3 +104,11 @@ cmd = "python src/repo_stargazer"
 [tool.poe.tasks.mcp]
 env = { RSG_CONFIG_FILE = "config.dev.toml", RSG_DATA_HOME =  "tmp" }
 cmd = "python src/repo_stargazer run-mcp-server"
+
+[tool.poe.tasks.test-adk-agent-web]
+env = { RSG_CONFIG_FILE = "config.dev.toml", RSG_DATA_HOME =  "tmp" }
+cmd = "adk web tests"
+
+[tool.poe.tasks.test-adk-agent-cli]
+env = { RSG_CONFIG_FILE = "config.dev.toml", RSG_DATA_HOME =  "tmp" }
+cmd = "adk run tests/adk_agent"

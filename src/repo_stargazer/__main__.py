@@ -10,29 +10,30 @@ from repo_stargazer.mcp_support._server import make_mcp_server
 cli_app = Typer(name="The RSG agent")
 
 
-def make_rsg() -> RSG:
+def _make_rsg() -> RSG:
     settings = Settings()  # type: ignore[call-arg]
+    print(settings)
     return RSG(settings)
 
 
 @cli_app.command()
 def build() -> None:
     """Build the database."""
-    rsg = make_rsg()
+    rsg = _make_rsg()
     rsg.build()
 
 
 @cli_app.command()
 def ask(query: str) -> None:
     """Ask a question."""
-    rsg = make_rsg()
-    asyncio.run(rsg.ask(query, search_kwargs={"k": 5}))
+    rsg = _make_rsg()
+    asyncio.run(rsg.retrieve_starred_repositories(query))
 
 
 @cli_app.command()
 def get_readme(repo_name: str) -> None:
     """Get the README of a repository."""
-    rsg = make_rsg()
+    rsg = _make_rsg()
     readme = rsg.get_readme(repo_name)
     print(readme)
 
@@ -40,7 +41,7 @@ def get_readme(repo_name: str) -> None:
 @cli_app.command()
 def run_mcp_server() -> None:
     """Run the MCP server."""
-    rsg = make_rsg()
+    rsg = _make_rsg()
     make_mcp_server(rsg).run(transport="stdio")
 
 
