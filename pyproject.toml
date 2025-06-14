@@ -108,9 +108,11 @@ cmd = "python src/repo_stargazer build"
 cmd = "python src/repo_stargazer run-mcp-server"
 
 [tool.poe.tasks.test-adk-agent-web]
+env = { "RSG_CONFIG_FILE" = "rsg-config.toml"}
 cmd = "adk web tests"
 
 [tool.poe.tasks.test-adk-agent-cli]
+env = { "RSG_CONFIG_FILE" = "rsg-config.toml"}
 cmd = "adk run tests/adk_agent"
 
 [tool.poe.tasks.agent-server]
