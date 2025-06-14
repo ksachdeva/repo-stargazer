@@ -1,6 +1,6 @@
 [project]
 name = "repo-stargazer"
-version = "0.0.1"
+version = "0.1.0"
 description = "Tell me about my stars"
 readme = "README.md"
 authors = [
@@ -111,4 +111,4 @@ cmd = "python src/repo_stargazer run-mcp-server"
 cmd = "python src/repo_stargazer run-a2a-server"
 
 [tool.poe.tasks.web-ui]
-cmd = "python src/repo_stargazer run_adk_server"
+cmd = "python src/repo_stargazer run-adk-server"
