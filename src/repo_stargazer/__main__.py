@@ -2,10 +2,12 @@
 
 import asyncio
 import logging
+import os
 from pathlib import Path
 
 import typer
 import uvicorn
+from google.adk.cli.fast_api import get_fast_api_app
 from typer import Typer
 
 from repo_stargazer._app import RSG
@@ -37,7 +39,7 @@ def build(
 
 
 @cli_app.command()
-def ask(
+def retrieve(
     query: str,
     config: Path = typer.Option(
         ...,
@@ -46,7 +48,7 @@ def ask(
         help="The RSG TOML Configuration file",
     ),
 ) -> None:
-    """Ask a question."""
+    """Retrieve top 5 repositories based on a query."""
     rsg = _make_rsg(config)
     asyncio.run(rsg.retrieve_starred_repositories(query))
 
@@ -82,7 +84,7 @@ def run_mcp_server(
 
 
 @cli_app.command()
-def run_agent_server(
+def run_a2a_server(
     config: Path = typer.Option(
         ...,
         file_okay=True,
@@ -90,6 +92,7 @@ def run_agent_server(
         help="The RSG TOML Configuration file",
     ),
 ) -> None:
+    """Run the A2A server for the agent."""
     rsg = _make_rsg(config)
     agent = rsg.make_adk_agent()
     settings = rsg.get_settings()
@@ -99,6 +102,40 @@ def run_agent_server(
         host=settings.a2a_server.host,
         port=settings.a2a_server.port,
     )
+
+
+@cli_app.command()
+def run_adk_server(
+    host: str = typer.Option("localhost", help="Host to run the server on"),
+    port: int = typer.Option(8000, help="Port to run the server on"),
+    config: Path = typer.Option(
+        ...,
+        file_okay=True,
+        dir_okay=False,
+        help="The RSG TOML Configuration file",
+    ),
+) -> None:
+    """Serve the agent via ADK Dev web server and UI."""
+
+    os.environ["RSG_CONFIG_FILE"] = str(config)
+
+    agents_dir = Path(__file__).parent / "ui"
+
+    app = get_fast_api_app(
+        agents_dir=str(agents_dir),
+        web=True,
+        trace_to_cloud=False,
+    )
+
+    uconfig = uvicorn.Config(
+        app,
+        host=host,
+        port=port,
+        reload=True,
+    )
+
+    server = uvicorn.Server(uconfig)
+    server.run()
 
 
 if __name__ == "__main__":
