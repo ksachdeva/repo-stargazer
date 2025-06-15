@@ -28,6 +28,8 @@ https://docs.astral.sh/uv/getting-started/installation/
 
 and then simply run `repo-stargazer` using `uvx`
 
+> If you don't know - `uvx` will create an isolated environment, download the latest version and then run this tool. It's magic!!
+
 ```bash
 uvx --from repo-stargazer rsg --help
 ```
