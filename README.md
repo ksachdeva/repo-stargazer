@@ -1,5 +1,8 @@
 # The Repo Stargazer
 
+![Demo of Repo Stargazer](assets/rsg.gif)
+
+
 ## Problem
 
 I have been starring github projects for a long time. 
