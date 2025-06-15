@@ -110,20 +110,21 @@ include = ["src", "tests", "samples"]
 reportUnnecessaryIsInstance = false
 reportMissingTypeStubs = false
 
-[tool.poe.tasks]
-fmt = "ruff format"
-
 [tool.poe.env]
 RSG_DATA_HOME = "tmp"
 
 [tool.poe.tasks.build]
+help = "Builds the database in RSG_DATA_HOME directory"
 cmd = "python src/repo_stargazer build"
 
 [tool.poe.tasks.mcp]
+help = "Runs the MCP server"
 cmd = "python src/repo_stargazer run-mcp-server"
 
 [tool.poe.tasks.a2a-server]
+help = "Runs the Google A2A server"
 cmd = "python src/repo_stargazer run-a2a-server"
 
 [tool.poe.tasks.adk-server]
+help = "Runs the Goole ADK server"
 cmd = "python src/repo_stargazer run-adk-server"
