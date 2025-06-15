@@ -67,10 +67,10 @@ def make_embedding_instance(embedder_settings: EmbedderSettings) -> Embeddings:
 def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None:
     parquet_files = data_directory().glob("*.starred.parquet")
 
-    def _process_read_me(index: int, row: pd.Series) -> tuple[list[str], list[GitHubRepoInfo]]:
+    def _process_read_me(name: str, row: pd.Series) -> tuple[list[str], list[GitHubRepoInfo]]:
         repo_info = GitHubRepoInfo(
             id=row["id"],
-            name=row["name"],
+            name=name,
             description=row["description"] or "",
             created_at=row["created_at"],
             topics=row["topics"],
@@ -84,7 +84,7 @@ def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None
             description_text_units = [row["description"]]
             description_metadatas = [repo_info]
 
-        readme_file_path = readme_data_directory() / f"{row.id}.md"
+        readme_file_path = readme_data_directory() / f"{row['id']}.md"
 
         # some repositories may not have a README file
         if not readme_file_path.exists():
@@ -93,11 +93,10 @@ def run_embedder(text_splitter: TextSplitter, vector_store: VectorStore) -> None
         readme_content = Path(readme_file_path).read_text(encoding="utf-8")
 
         if readme_content.strip() == "":
-            _LOGGER.warning("Skipping empty README for repository %s", row["name"])
+            _LOGGER.warning("Skipping empty README for repository %s", name)
             return description_text_units, description_metadatas
 
         text_units = text_splitter.split_text(readme_content)
-        # _LOGGER.debug("Number of text units for repo %s: %d", row["name"], len(text_units))
 
         metadatas = [repo_info] * len(text_units)
 

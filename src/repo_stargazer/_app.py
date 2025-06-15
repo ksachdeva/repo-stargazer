@@ -45,7 +45,9 @@ def _repos_to_df(repos: list[Repository]) -> pd.DataFrame:
     with WorkerPool() as pool:
         records = pool.map(repo_to_dict, repos, progress_bar=True)
 
-    return pd.DataFrame(records)
+    df = pd.DataFrame(records)
+
+    return df.set_index("name")
 
 
 class RSG:
@@ -115,23 +117,17 @@ class RSG:
 
         df = pd.read_parquet(parquet_file_path)
 
-        try:
-            repo_id = df[df["name"] == repo_name].iloc[0]["id"]
-
-            _LOGGER.info("Fetching README for repository %s with ID %s", repo_name, repo_id)
-
-            readme_file_path = readme_data_directory() / f"{repo_id}.md"
-            if not readme_file_path.exists():
-                return f"README for repository {repo_name} not found."
-
-            return readme_file_path.read_text()
-
-        except IndexError:
+        if repo_name not in df.index:
             _LOGGER.error("Repository %s not found in starred repositories.", repo_name)
             return f"Repository {repo_name} not found in starred repositories."
-        except Exception as e:
-            _LOGGER.error("Error fetching README for repository %s: %s", repo_name, e)
-            return f"Error fetching README for repository {repo_name}: {e}"
+
+        repo_id = df.loc[repo_name]["id"]
+
+        readme_file_path = readme_data_directory() / f"{repo_id}.md"
+        if not readme_file_path.exists():
+            return f"README for repository {repo_name} not found."
+
+        return readme_file_path.read_text()
 
     def make_adk_agent(self) -> LlmAgent:
         return create_adk_agent(
@@ -167,8 +163,8 @@ class RSG:
             df.to_parquet(parquet_file_path)
 
         # fetch the readme of the repositories
-        def _fetch_and_write_readme(index: int, row: pd.Series) -> None:
-            readme_file_path = readme_data_directory() / f"{row.id}.md"
+        def _fetch_and_write_readme(name: str, row: pd.Series) -> None:
+            readme_file_path = readme_data_directory() / f"{row['id']}.md"
             if readme_file_path.exists():
                 return
             repo = self._gh.get_repo(row["id"])
@@ -177,7 +173,7 @@ class RSG:
             except Exception as e:
                 _LOGGER.warning(
                     "Failed to fetch README for repository %s: %s",
-                    row["name"],
+                    name,
                     e,
                 )
                 return
