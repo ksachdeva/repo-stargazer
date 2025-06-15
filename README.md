@@ -20,10 +20,6 @@ further explore the starred repositories.
 
 This project/tool uses semantic search and an AI agent as an attempt to solve the above problems.
 
-## Architecture & Implementation Details
-
-[TBD]
-
 ## Install (User)
 
 Read below to install `uv`. You haven't done it yet? Come on guys!!
@@ -47,7 +43,12 @@ You should make a copy of it and perhaps call it `rsg-config.toml` (The name of 
 
 ### Step 1 - Obtain the Github Personal Access Token
 
-[TBD]
+This tool fetches your starred github repositories. In order to access to them without incurring rate limits
+it is required to use the Github Personal Access Token.
+
+Read this to learn how to obtain it -
+
+https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/managing-your-personal-access-tokens
 
 ### Step 2 - Edit the `rsg-config.toml`
 
@@ -55,9 +56,22 @@ You should make a copy of it and perhaps call it `rsg-config.toml` (The name of 
 - You should fill the `[embedder]` section (Supported provider types are - ollama, openai, azure_openai)
 - You should fill the `[agent.litellm_params]` section
 
-[TBD] - Don't think above instructions are enough! To update and explain in detail the settings
+In `rsg-config.example.toml`, I have added necessary comments to help fill out various configuration.
 
 ### Step 3 - Build the database
+
+The real work starts with this step. 
+
+At the moment, I use naive RAG technique.
+
+- Information about your starred github repos are downloaded using the GitHub API
+- Then the `readme` files of these repos are downloaded. Note - Some repos, do not have `readme` file.
+- Then these `readme` files are chunked and their embeddings are stored in a vector store
+
+The data above (including vectorstore) is stored in your computers data directories for example `$HOME/.local/share/rsg`
+on macos and linux.
+
+You can change the location of the data by setting the environment variable `RSG_DATA_HOME`
 
 ```bash
 uvx --from repo-stargazer rsg build --config rsg-config.toml
@@ -65,9 +79,11 @@ uvx --from repo-stargazer rsg build --config rsg-config.toml
 
 ### Step 4 - Run the agent using adk web & ui
 
-The agent is built using Google ADK and I have done somewhat of a hack to be able run the agent
-by the built-in fastapi server & user interface. The server & user interface is meant for development needs but
-for now it is the only UI there is 
+Let's see all of it in action.
+
+For the user interface, I am still using the development UI that comes as part of Google ADK. 
+
+In near future, would provide a decent UI with out any developer specific elements.
 
 ```bash
 uvx --from repo-stargazer rsg run-adk-server --config rsg-config.toml
