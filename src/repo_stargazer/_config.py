@@ -11,7 +11,6 @@ from pydantic_settings import (
 )
 
 from ._types import EmbeddingModelType
-from .a2a_support import AgentServerConfig
 from .agent import AgentConfig
 
 
@@ -34,7 +33,6 @@ class Settings(BaseSettings):
     embedder: EmbedderSettings
 
     agent: AgentConfig
-    a2a_server: AgentServerConfig
 
     _toml_file: ClassVar[Path]
 

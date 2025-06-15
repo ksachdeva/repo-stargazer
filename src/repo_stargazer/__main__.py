@@ -10,12 +10,13 @@ import uvicorn
 from google.adk.cli.fast_api import get_fast_api_app
 from typer import Typer
 
+from repo_stargazer import __version__
 from repo_stargazer._app import RSG
 from repo_stargazer._config import Settings
 from repo_stargazer.a2a_support import make_a2a_server
 from repo_stargazer.mcp_support._server import make_mcp_server
 
-cli_app = Typer(name="The RSG agent")
+cli_app = Typer(name=f"The RSG agent [{__version__}]")
 
 
 def _make_rsg(config: Path) -> RSG:
@@ -85,6 +86,8 @@ def run_mcp_server(
 
 @cli_app.command()
 def run_a2a_server(
+    host: str = typer.Option("localhost", help="Host to run the server on"),
+    port: int = typer.Option(10001, help="Port to run the server on"),
     config: Path = typer.Option(
         ...,
         file_okay=True,
@@ -95,12 +98,12 @@ def run_a2a_server(
     """Run the A2A server for the agent."""
     rsg = _make_rsg(config)
     agent = rsg.make_adk_agent()
-    settings = rsg.get_settings()
-    a2a_app = make_a2a_server(agent, settings.a2a_server)
+    url = f"http://{host}:{port}"
+    a2a_app = make_a2a_server(agent, url, __version__)
     uvicorn.run(
         app=a2a_app.build(),
-        host=settings.a2a_server.host,
-        port=settings.a2a_server.port,
+        host=host,
+        port=port,
     )
 
 

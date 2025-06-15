@@ -122,8 +122,8 @@ cmd = "python src/repo_stargazer build"
 [tool.poe.tasks.mcp]
 cmd = "python src/repo_stargazer run-mcp-server"
 
-[tool.poe.tasks.agent-server]
+[tool.poe.tasks.a2a-server]
 cmd = "python src/repo_stargazer run-a2a-server"
 
-[tool.poe.tasks.web-ui]
+[tool.poe.tasks.adk-server]
 cmd = "python src/repo_stargazer run-adk-server"

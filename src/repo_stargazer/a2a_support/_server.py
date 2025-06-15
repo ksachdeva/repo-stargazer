@@ -6,7 +6,6 @@ from google.adk.agents import LlmAgent
 
 from repo_stargazer.agent import DEFAULT_DESCRIPTION
 
-from ._config import AgentServerConfig
 from ._executor import RepoStargazerAgentExecutor
 
 _NAME: str = "RSG"
@@ -14,7 +13,8 @@ _NAME: str = "RSG"
 
 def make_a2a_server(
     agent: LlmAgent,
-    config: AgentServerConfig,
+    url: str,
+    version: str,
 ) -> A2AStarletteApplication:
     skills = [
         AgentSkill(
@@ -28,8 +28,8 @@ def make_a2a_server(
     agent_card = AgentCard(
         name=_NAME,
         description=DEFAULT_DESCRIPTION,
-        url=f"http://{config.host}:{config.port}/",
-        version="0.0.1",
+        url=url,
+        version=version,
         defaultInputModes=["text"],
         defaultOutputModes=["text"],
         capabilities=AgentCapabilities(streaming=True),
