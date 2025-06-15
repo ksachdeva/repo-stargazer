@@ -3,9 +3,9 @@
     
     "rsg": {
       "command": "uv",
-      "args": ["run src/repo_stargazer run-mcp-server"],
+      "args": ["run src/repo_stargazer run-mcp-server --config rsg-config.toml"],
       "env": {
-        "RSG_CONFIG_FILE" : "config.dev.toml"
+        "RSG_DATA_HOME" : "tmp"
       }
     }
   }
