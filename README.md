@@ -90,3 +90,39 @@ In near future, would provide a decent UI with out any developer specific elemen
 ```bash
 uvx --from repo-stargazer rsg run-adk-server --config rsg-config.toml
 ```
+
+## Developer
+
+```bash
+# I shouldn't have to write this instruction. But what the heck!
+git clone https://github.com/ksachdeva/repo-stargazer
+```
+
+Now open the repo in `devcontainer`. You should know these things!
+
+Just in case, Read if you have never used `devcontainers` 
+
+https://code.visualstudio.com/docs/devcontainers/containers
+
+Various commands (via poe [https://poethepoet.natn.io/index.html]) to use during development.
+
+> Hint - Look inside `pyproject.toml` to see the underlying poe magic!
+
+```bash
+# Help
+# Note - The `pyproject.toml` has `RSG_DATA_HOME` env variable set to `$PWD/tmp`
+uv run poe --help
+```
+
+
+```bash
+# Build the database
+# Note - The `pyproject.toml` has `RSG_DATA_HOME` env variable set to `$PWD/tmp`
+uv run poe build --config rsg-config.toml
+```
+
+```bash
+# Run the Google ADK server
+# Note - The `pyproject.toml` has `RSG_DATA_HOME` env variable set to `$PWD/tmp`
+uv run poe adk-server --config rsg-config.toml
+```
