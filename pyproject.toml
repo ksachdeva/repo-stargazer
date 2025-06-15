@@ -1,12 +1,12 @@
 [project]
 name = "repo-stargazer"
-version = "0.1.0"
+version = "0.2.0"
 description = "Tell me about my stars"
 readme = "README.md"
 authors = [
     { name = "Sachdeva, Kapil"}
 ]
-requires-python = ">=3.13"
+requires-python = ">=3.11"
 dependencies = [
     "a2a-sdk>=0.2.8",
     "fastparquet>=2024.11.0",
@@ -30,6 +30,21 @@ dependencies = [
     "typer>=0.16.0",
     "xdg-base-dirs>=6.0.2",
 ]
+
+classifiers = [
+  "Intended Audience :: Developers",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "License :: OSI Approved :: Apache Software License",
+]
+
+[project.urls]
+repository = "https://github.com/ksachdeva/repo-stargazer"
 
 [build-system]
 requires = ["hatchling"]
@@ -56,7 +71,7 @@ dev-dependencies = [
 [tool.ruff]
 line-length = 120
 fix = true
-target-version = "py313"
+target-version = "py311"
 
 [tool.ruff.format]
 docstring-code-format = true
@@ -74,7 +89,7 @@ extend-immutable-calls = ["fastapi.Depends", "fastapi.params.Depends", "fastapi.
 
 [tool.mypy]
 strict = true
-python_version = "3.13"
+python_version = "3.11"
 ignore_missing_imports = true
 
 # from https://blog.wolt.com/engineering/2021/09/30/professional-grade-mypy-configuration/

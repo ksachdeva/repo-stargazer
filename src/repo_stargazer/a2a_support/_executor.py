@@ -1,5 +1,4 @@
 import logging
-from typing import override
 
 from a2a.server.agent_execution import AgentExecutor, RequestContext
 from a2a.server.events import EventQueue
@@ -12,6 +11,7 @@ from google.adk.memory.in_memory_memory_service import InMemoryMemoryService
 from google.adk.sessions import InMemorySessionService, Session
 from google.genai import types as genai_types
 from pydantic import ConfigDict
+from typing_extensions import override
 
 from ._utils import convert_a2a_parts_to_genai, convert_genai_parts_to_a2a
 
