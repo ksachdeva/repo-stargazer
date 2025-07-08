@@ -13,7 +13,6 @@ from typer import Typer
 from repo_stargazer import __version__
 from repo_stargazer._app import RSG
 from repo_stargazer._config import Settings
-from repo_stargazer.a2a_support import make_a2a_server
 from repo_stargazer.mcp_support._server import make_mcp_server
 
 cli_app = Typer(name=f"The RSG agent [{__version__}]")
@@ -82,29 +81,6 @@ def run_mcp_server(
     """Run the MCP server."""
     rsg = _make_rsg(config)
     make_mcp_server(rsg).run(transport="stdio")
-
-
-@cli_app.command()
-def run_a2a_server(
-    host: str = typer.Option("localhost", help="Host to run the server on"),
-    port: int = typer.Option(10001, help="Port to run the server on"),
-    config: Path = typer.Option(
-        ...,
-        file_okay=True,
-        dir_okay=False,
-        help="The RSG TOML Configuration file",
-    ),
-) -> None:
-    """Run the A2A server for the agent."""
-    rsg = _make_rsg(config)
-    agent = rsg.make_adk_agent()
-    url = f"http://{host}:{port}"
-    a2a_app = make_a2a_server(agent, url, __version__)
-    uvicorn.run(
-        app=a2a_app.build(),
-        host=host,
-        port=port,
-    )
 
 
 @cli_app.command()

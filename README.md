@@ -17,7 +17,7 @@ Unfortunately the user interface to search the existing starred repositories is 
 Also, it would be nice to have not only Semantic search but also provide the results to LLM to 
 further explore the starred repositories.
 
-> I also wanted to explore Google ADK, Google A2A Protocol & MCP. This project makes use of all 3 technologies.
+> I also wanted to explore Google ADK, Google A2A Protocol & MCP. This project makes use of all 3 technologies (A2A support will be put back after Google ADK has native integration of it).
 
 ## Solution
 
