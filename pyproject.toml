@@ -1,13 +1,14 @@
 [project]
 name = "repo-stargazer"
-version = "0.2.2"
+version = "0.3.0"
 description = "Tell me about my stars"
 readme = "README.md"
 authors = [
     { name = "Sachdeva, Kapil"}
 ]
 requires-python = ">=3.11"
-dependencies = [    
+dependencies = [
+    "arize-phoenix-otel>=0.12.1",
     "fastparquet>=2024.11.0",
     "google-adk>=1.5.0",
     "httpx>=0.28.1",
@@ -21,6 +22,7 @@ dependencies = [
     "litellm>=1.73.0",
     "mcp>=1.9.3",
     "mpire>=2.10.2",
+    "openinference-instrumentation-google-adk>=0.1.1",
     "pandas>=2.3.0",
     "pydantic>=2.11.5",
     "pydantic-settings>=2.9.1",

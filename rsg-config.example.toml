@@ -2,6 +2,13 @@
 # to learn how to get the GitHub Personal Access Token
 github_pat = ""
 
+# uncomment this section & fill
+# required fields to enable traching to https://arize.com/docs/phoenix
+#[phoenix_otel]
+#api_key=""
+#project_name="default"
+#collection_endpoint=""
+
 [embedder]
 # possible values for provider_type are - ollama, azure_openai, openai 
 provider_type = "ollama" 

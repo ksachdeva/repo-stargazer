@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 from repo_stargazer import RSG, Settings
+from repo_stargazer._otel import enable_arize_otel_if_needed
 
 CONFIG_FILE_PATH = os.getenv("RSG_CONFIG_FILE", None)
 
@@ -12,6 +13,8 @@ if CONFIG_FILE_PATH is None:
 
 Settings._toml_file = Path(CONFIG_FILE_PATH)
 settings = Settings()  # type: ignore
+
+enable_arize_otel_if_needed(settings)
 
 app = RSG(settings=settings)
 

@@ -26,11 +26,18 @@ class EmbedderSettings(BaseModel):
     chunk_overlap: int = 100
 
 
+class PhoenixOTELSettings(BaseModel):
+    api_key: SecretStr
+    project_name: str
+    collection_endpoint: str
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict()
 
     github_pat: SecretStr
     embedder: EmbedderSettings
+    phoenix_otel: PhoenixOTELSettings | None = None
 
     agent: AgentConfig
 

@@ -13,6 +13,7 @@ from typer import Typer
 from repo_stargazer import __version__
 from repo_stargazer._app import RSG
 from repo_stargazer._config import Settings
+from repo_stargazer._otel import enable_arize_otel_if_needed
 from repo_stargazer.mcp_support._server import make_mcp_server
 
 cli_app = Typer(name=f"The RSG agent [{__version__}]")
@@ -21,6 +22,7 @@ cli_app = Typer(name=f"The RSG agent [{__version__}]")
 def _make_rsg(config: Path) -> RSG:
     Settings._toml_file = config  # type: ignore[attr-defined]
     settings = Settings()  # type: ignore[call-arg]
+    enable_arize_otel_if_needed(settings)
     return RSG(settings=settings)
 
 
